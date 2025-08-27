@@ -1,0 +1,5 @@
+[12-Aug-2025 13:46:53 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/customer/www/rsoa172.planetearth.school/public_html/CNN/article.php on line 28
+[12-Aug-2025 13:46:53 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/customer/www/rsoa172.planetearth.school/public_html/CNN/article.php on line 181
+[12-Aug-2025 13:46:53 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/customer/www/rsoa172.planetearth.school/public_html/CNN/article.php on line 182
+[12-Aug-2025 13:46:53 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /home/customer/www/rsoa172.planetearth.school/public_html/CNN/article.php on line 183
+ 
