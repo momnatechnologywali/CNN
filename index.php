@@ -1,0 +1,244 @@
+<?php
+session_start();
+include 'db.php';
+ 
+// Fetch featured news
+$featured_query = "SELECT * FROM news WHERE is_featured = 1 ORDER BY publish_date DESC LIMIT 3";
+$featured_result = $conn->query($featured_query);
+ 
+// Fetch categories
+$categories_query = "SELECT DISTINCT category FROM news";
+$categories_result = $conn->query($categories_query);
+ 
+// Fetch latest news
+$latest_query = "SELECT * FROM news ORDER BY publish_date DESC LIMIT 6";
+$latest_result = $conn->query($latest_query);
+?>
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsWave - Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+ 
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+ 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+ 
+        header {
+            background-color: #b22222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+ 
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+ 
+        nav {
+            background-color: #333;
+            padding: 10px;
+        }
+ 
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+ 
+        nav a:hover {
+            background-color: #555;
+            border-radius: 5px;
+        }
+ 
+        .featured {
+            background: linear-gradient(to right, #ff0000, #b22222);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+ 
+        .featured h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+ 
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+ 
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+ 
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+ 
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+ 
+        .news-card-content {
+            padding: 15px;
+        }
+ 
+        .news-card h3 {
+            margin-bottom: 10px;
+            color: #b22222;
+        }
+ 
+        .categories {
+            margin: 20px 0;
+        }
+ 
+        .categories h2 {
+            margin-bottom: 20px;
+            color: #b22222;
+        }
+ 
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+ 
+        .category-list a {
+            background-color: #b22222;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+ 
+        .category-list a:hover {
+            background-color: #8b0000;
+        }
+ 
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+ 
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+ 
+            header h1 {
+                font-size: 1.8em;
+            }
+ 
+            nav a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NewsWave</h1>
+        <p>Your Source for Breaking News</p>
+    </header>
+ 
+    <nav>
+        <a href="index.php">Home</a>
+        <?php while ($category = $categories_result->fetch_assoc()): ?>
+            <a href="category.php?cat=<?php echo urlencode($category['category']); ?>">
+                <?php echo htmlspecialchars($category['category']); ?>
+            </a>
+        <?php endwhile; ?>
+    </nav>
+ 
+    <div class="container">
+        <section class="featured">
+            <h2>Breaking News</h2>
+            <div class="news-grid">
+                <?php while ($news = $featured_result->fetch_assoc()): ?>
+                    <div class="news-card">
+                        <img src="<?php echo htmlspecialchars($news['image_url']); ?>" alt="News Image">
+                        <div class="news-card-content">
+                            <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                            <p><?php echo substr(htmlspecialchars($news['content']), 0, 100) . '...'; ?></p>
+                            <a href="article.php?id=<?php echo $news['id']; ?>" onclick="redirectToArticle(<?php echo $news['id']; ?>)">Read More</a>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+        </section>
+ 
+        <section class="categories">
+            <h2>News Categories</h2>
+            <div class="category-list">
+                <?php 
+                $categories_result->data_seek(0); // Reset categories pointer
+                while ($category = $categories_result->fetch_assoc()): ?>
+                    <a href="category.php?cat=<?php echo urlencode($category['category']); ?>">
+                        <?php echo htmlspecialchars($category['category']); ?>
+                    </a>
+                <?php endwhile; ?>
+            </div>
+        </section>
+ 
+        <section class="latest-news">
+            <h2>Latest News</h2>
+            <div class="news-grid">
+                <?php while ($news = $latest_result->fetch_assoc()): ?>
+                    <div class="news-card">
+                        <img src="<?php echo htmlspecialchars($news['image_url']); ?>" alt="News Image">
+                        <div class="news-card-content">
+                            <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                            <p><?php echo substr(htmlspecialchars($news['content']), 0, 100) . '...'; ?></p>
+                            <a href="article.php?id=<?php echo $news['id']; ?>" onclick="redirectToArticle(<?php echo $news['id']; ?>)">Read More</a>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+        </section>
+    </div>
+ 
+    <footer>
+        <p>&copy; 2025 NewsWave. All rights reserved.</p>
+    </footer>
+ 
+    <script>
+        function redirectToArticle(id) {
+            window.location.href = 'article.php?id=' + id;
+        }
+    </script>
+</body>
+</html>
+<?php $conn->close(); ?>
